@@ -16,10 +16,15 @@ package main
 
 import (
 	"context"
+	"fmt"
 )
 
 type Ci struct{}
 
 func (m *Ci) BuildDocker(ctx context.Context, dir *Directory) *Container {
 	return m.getDocker(dir)
+}
+
+func (m *Ci) Echo(ctx context.Context, msg string) string {
+	return fmt.Sprintf("echo %s", msg)
 }

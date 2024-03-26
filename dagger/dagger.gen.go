@@ -594,6 +594,21 @@ func invoke(ctx context.Context, parentJSON []byte, parentName string, fnName st
 				}
 			}
 			return (*Ci).BuildDocker(&parent, ctx, dir), nil
+		case "Echo":
+			var parent Ci
+			err = json.Unmarshal(parentJSON, &parent)
+			if err != nil {
+				panic(fmt.Errorf("%s: %w", "failed to unmarshal parent object", err))
+			}
+			var msg string
+			if inputArgs["msg"] != nil {
+				err = json.Unmarshal([]byte(inputArgs["msg"]), &msg)
+				if err != nil {
+					panic(fmt.Errorf("%s: %w", "failed to unmarshal input arg msg", err))
+				}
+			}
+			(*Ci).Echo(&parent, ctx, msg)
+			return nil, nil
 		default:
 			return nil, fmt.Errorf("unknown function %s", fnName)
 		}
@@ -605,7 +620,11 @@ func invoke(ctx context.Context, parentJSON []byte, parentName string, fnName st
 					WithFunction(
 						dag.Function("BuildDocker",
 							dag.TypeDef().WithObject("Container")).
-							WithArg("dir", dag.TypeDef().WithObject("Directory")))), nil
+							WithArg("dir", dag.TypeDef().WithObject("Directory"))).
+					WithFunction(
+						dag.Function("Echo",
+							dag.TypeDef().WithKind(VoidKind).WithOptional(true)).
+							WithArg("msg", dag.TypeDef().WithKind(StringKind)))), nil
 	default:
 		return nil, fmt.Errorf("unknown object %s", parentName)
 	}
