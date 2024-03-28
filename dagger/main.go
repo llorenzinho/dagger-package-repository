@@ -19,12 +19,24 @@ import (
 	"fmt"
 )
 
-type Ci struct{}
+type Ci struct {
+	DockerDep *Container
+}
+
+func (m *Ci) WithDockerDeps() *Ci {
+	m.DockerDep = m.getDockerDep()
+	return m
+}
 
 func (m *Ci) BuildDocker(ctx context.Context, dir *Directory) *Container {
 	return m.getDocker(dir)
 }
 
+func (m *Ci) Ciao(ctx context.Context) string {
+	return "ciao"
+}
+
+// Echo returns a string
 func (m *Ci) Echo(ctx context.Context, msg string) string {
 	return fmt.Sprintf("echo %s", msg)
 }
